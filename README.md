@@ -15,7 +15,7 @@ This ensures that each user has a unique hostname and that if the challenge is r
 will still have the same hostname.
 3. The template is fetched from the kubernetes control plane. We then check if the current template
 can be executed at the current time.
-4. The container ID, owner ID, and expiry date is inejected into the template.
+4. The container ID, owner ID, and expiry date is injected into the template.
 5. This template is then applied using the Kubernetes API.
 6. If the player wants to extend the challenge expiry, they may do so by clicking the extend button.
 This will restore the original expiry time on the challenge.
