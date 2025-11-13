@@ -20,7 +20,7 @@ jobs:
     name: Docker build and push
     needs:
       - release
-    uses: the0mikkel/ci/.github/workflows/docker.yml@v1.3.1
+    uses: the0mikkel/ci/.github/workflows/docker.yml@v1.4.0
     if: github.repository == 'ctfpilot/kube-ctf' && (needs.release.outputs.version != '' && needs.release.outputs.version != null)
     with:
       semver: ${{ needs.release.outputs.version }}
