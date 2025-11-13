@@ -22,6 +22,10 @@ jobs:
       - release
     uses: the0mikkel/ci/.github/workflows/docker.yml@v1.4.0
     if: github.repository == 'ctfpilot/kube-ctf' && (needs.release.outputs.version != '' && needs.release.outputs.version != null)
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
     with:
       semver: ${{ needs.release.outputs.version }}
       arguments: |
