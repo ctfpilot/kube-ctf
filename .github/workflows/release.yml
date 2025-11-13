@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  release:
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    name: Release
+    if: github.repository == 'ctfpilot/kube-ctf'
+    uses: the0mikkel/ci/.github/workflows/semver-release-standalone.yml@v1.4.0
+
+  docker:
+    name: Docker build and push
+    needs:
+      - release
+    uses: the0mikkel/ci/.github/workflows/docker.yml@v1.3.1
+    if: github.repository == 'ctfpilot/kube-ctf' && (needs.release.outputs.version != '' && needs.release.outputs.version != null)
+    with:
+      semver: ${{ needs.release.outputs.version }}
+      arguments: |
+        VERSION=${{ needs.release.outputs.version }}
