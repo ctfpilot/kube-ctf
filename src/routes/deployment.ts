@@ -61,8 +61,7 @@ export default async function register(fastify: FastifyInstance) {
       request.requestContext.set('admin', !!payload.admin);
 
       request.log.info(
-        `auth_info: owner_id=${payload.owner_id}${payload.admin ? ', admin' : ''
-        }`
+        `auth_info: owner_id=${payload.owner_id}${payload.admin ? ', admin' : ''}`
       );
     } catch (e) {
       request.log.warn('auth error', e);
