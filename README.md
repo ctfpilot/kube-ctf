@@ -31,7 +31,7 @@ but this is quick and dirty.
 KUBECTF_NAMESPACE="default" # namespace to run the isolated challenges in
 KUBECTF_BASE_DOMAIN="example.com" # base domain of the isolated challenges
 KUBECTF_API_DOMAIN="challenge-manager.${BASE_DOMAIN}" # api domain of the isolated challenges
-KUBECTF_MAX_OWNER_DEPLOYMENTS="0" # Maximum amunt of deployments per team. 0 is unlimited
+KUBECTF_MAX_OWNER_DEPLOYMENTS="0" # Maximum amount of deployments per team. 0 is unlimited
 KUBECTF_AUTH_SECRET="keyboard-cat" # secret to sign the JWT for CTFd
 KUBECTF_CONTAINER_SECRET="keyboard-cat" # secret to generate the container IDs
 KUBECTF_REGISTRY_PREFIX="gcr.io/downunderctf" # container registry prefix exposed through the handlebars variable registry_prefix
