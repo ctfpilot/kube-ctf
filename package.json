@@ -1,12 +1,56 @@
 {
   "name": "challenge-manager",
-  "version": "0.1.0",
   "description": "Kubernetes challenge manager",
   "main": "dist/server.js",
-  "repository": "https://github.com/DownUnderCTF/kube-ctf",
+  "repository": "https://github.com/ctfpilot/kube-ctf",
   "author": "tom <tom@tomn.me>",
   "license": "MIT",
   "private": true,
+  "release": {
+    "branches": [
+      "main",
+      {
+        "name": "develop",
+        "prerelease": "r"
+      }
+    ],
+    "plugins": [
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "preset": "conventionalcommits"
+        }
+      ],
+      [
+        "@semantic-release/release-notes-generator",
+        {
+          "preset": "conventionalcommits"
+        }
+      ],
+      [
+        "@semantic-release/github",
+        {
+          "successComment": false
+        }
+      ],
+      [
+        "@semantic-release/exec",
+        {
+          "prepareCmd": "echo ${nextRelease.version}",
+          "publishCmd": "echo 'Published version ${nextRelease.version}'"
+        }
+      ],
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "version.txt"
+          ],
+          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+        }
+      ]
+    ]
+  },
   "scripts": {
     "start": "NODE_ENV=development tsc-watch --onSuccess \"node dist/\"",
     "build": "tsc",
