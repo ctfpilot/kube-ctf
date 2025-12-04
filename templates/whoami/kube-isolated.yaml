@@ -1,5 +1,5 @@
 apiVersion: ctfpilot.com/v1
-kind: IsolatedChallenge
+kind: InstancedChallenge
 metadata:
   name: whoami
 spec:
@@ -11,28 +11,28 @@ spec:
     kind: Deployment
     metadata:
       name: "ctf-{{ deployment_id }}"
-      namespace: kubectf-challenges-isolated
+      namespace: kubectf-challenges-instanced
       labels:
-        ctfpilot.com/type: web
-        ctfpilot.com/name: whoami
-        isolated-challenge.ctfpilot.com/deployment: "{{ deployment_id }}"
-        isolated-challenge.ctfpilot.com/owner: "{{ owner_id }}"
+        challenges.ctfpilot.com/type: web
+        challenges.ctfpilot.com/name: whoami
+        instanced.challenges.ctfpilot.com/deployment: "{{ deployment_id }}"
+        instanced.challenges.ctfpilot.com/owner: "{{ owner_id }}"
       annotations:
         janitor/expires: "{{ expires }}"
     spec:
       replicas: 1
       selector:
         matchLabels:
-          isolated-challenge.ctfpilot.com/deployment: "{{ deployment_id }}"
-          isolated-challenge.ctfpilot.com/owner: "{{ owner_id }}"
+          instanced.challenges.ctfpilot.com/deployment: "{{ deployment_id }}"
+          instanced.challenges.ctfpilot.com/owner: "{{ owner_id }}"
       template:
         metadata:
           labels:
             role: web
-            ctfpilot.com/type: web
-            ctfpilot.com/name: whoami
-            isolated-challenge.ctfpilot.com/deployment: "{{ deployment_id }}"
-            isolated-challenge.ctfpilot.com/owner: "{{ owner_id }}"
+            challenges.ctfpilot.com/type: web
+            challenges.ctfpilot.com/name: whoami
+            instanced.challenges.ctfpilot.com/deployment: "{{ deployment_id }}"
+            instanced.challenges.ctfpilot.com/owner: "{{ owner_id }}"
         spec:
           enableServiceLinks: false
           automountServiceAccountToken: false
@@ -54,18 +54,18 @@ spec:
     kind: Service
     metadata:
       name: "ctf-{{ deployment_id }}"
-      namespace: kubectf-challenges-isolated
+      namespace: kubectf-challenges-instanced
       labels:
-        ctfpilot.com/type: web
-        ctfpilot.com/name: whoami
-        isolated-challenge.ctfpilot.com/deployment: "{{ deployment_id }}"
-        isolated-challenge.ctfpilot.com/owner: "{{ owner_id }}"
+        challenges.ctfpilot.com/type: web
+        challenges.ctfpilot.com/name: whoami
+        instanced.challenges.ctfpilot.com/deployment: "{{ deployment_id }}"
+        instanced.challenges.ctfpilot.com/owner: "{{ owner_id }}"
       annotations:
         janitor/expires: "{{ expires }}"
     spec:
       selector:
         role: web
-        isolated-challenge.ctfpilot.com/deployment: "{{ deployment_id }}"
+        instanced.challenges.ctfpilot.com/deployment: "{{ deployment_id }}"
       ports:
         - port: 80
           name: port-80
@@ -74,12 +74,12 @@ spec:
     kind: IngressRoute
     metadata:
       name: ingress-ctf-{{ deployment_id }}
-      namespace: kubectf-challenges-isolated
+      namespace: kubectf-challenges-instanced
       labels:
-        ctfpilot.com/type: web
-        ctfpilot.com/name: whoami
-        isolated-challenge.ctfpilot.com/deployment: "{{ deployment_id }}"
-        isolated-challenge.ctfpilot.com/owner: "{{ owner_id }}"
+        challenges.ctfpilot.com/type: web
+        challenges.ctfpilot.com/name: whoami
+        instanced.challenges.ctfpilot.com/deployment: "{{ deployment_id }}"
+        instanced.challenges.ctfpilot.com/owner: "{{ owner_id }}"
       annotations:
         janitor/expires: "{{ expires }}"
     spec:

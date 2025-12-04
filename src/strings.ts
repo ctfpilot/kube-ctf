@@ -1,5 +1,5 @@
 export const API_GROUP = 'ctfpilot.com';
-export const ISOLATED_CHALLENGE_QUALIFIER = `isolated-challenge.${API_GROUP}`;
+export const ISOLATED_CHALLENGE_QUALIFIER = `instanced.challenges.${API_GROUP}`;
 export const ERROR_DEPLOYMENT_FAILED = 'Deployment failed.';
 export const ERROR_RATE_LIMIT = 'Rate limit reached.';
 export const ERROR_DEPLOYMENT_EXISTS = 'Deployment already exists.';
