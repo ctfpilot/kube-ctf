@@ -22,7 +22,7 @@ export class KubernetesRepository implements ChallengeConfigStoreRepository {
 
   private async _get(name: string): Promise<Challenge | null> {
     return this.customObjectsApi
-      .getClusterCustomObject(API_GROUP, 'v1', 'isolated-challenges', name)
+      .getClusterCustomObject(API_GROUP, 'v1', 'instanced-challenges', name)
       .then(response => {
         const body = response.body as KubeIsolatedChallenge;
         return {
