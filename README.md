@@ -52,10 +52,10 @@ will fail to renew/remove the resource later on.
 
 ```
 labels:
-  ctfpilot.com/type: misc
-  ctfpilot.com/name: challenge
-  isolated-challenge.ctfpilot.com/deployment: "{{ deployment_id }}"
-  isolated-challenge.ctfpilot.com/owner: "{{ owner_id }}"
+  challenges.ctfpilot.com/type: misc
+  challenges.ctfpilot.com/name: challenge
+  instanced.challenges.ctfpilot.com/deployment: "{{ deployment_id }}"
+  instanced.challenges.ctfpilot.com/owner: "{{ owner_id }}"
 annotations:
   janitor/expires: "{{ expires }}"
 ```
