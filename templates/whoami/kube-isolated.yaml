@@ -1,5 +1,5 @@
 apiVersion: ctfpilot.com/v1
-kind: instancedChallenge
+kind: InstancedChallenge
 metadata:
   name: whoami
 spec:
