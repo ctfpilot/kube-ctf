@@ -1,4 +1,4 @@
-apiVersion: ctfpilot.com/v1
+apiVersion: kube-ctf.ctfpilot.com/v1
 kind: InstancedChallenge
 metadata:
   name: whoami
@@ -11,7 +11,7 @@ spec:
     kind: Deployment
     metadata:
       name: "ctf-{{ deployment_id }}"
-      namespace: kubectf-challenges-instanced
+      namespace: ctfpilot-challenges-instanced
       labels:
         challenges.ctfpilot.com/type: web
         challenges.ctfpilot.com/name: whoami
@@ -54,7 +54,7 @@ spec:
     kind: Service
     metadata:
       name: "ctf-{{ deployment_id }}"
-      namespace: kubectf-challenges-instanced
+      namespace: ctfpilot-challenges-instanced
       labels:
         challenges.ctfpilot.com/type: web
         challenges.ctfpilot.com/name: whoami
@@ -74,7 +74,7 @@ spec:
     kind: IngressRoute
     metadata:
       name: ingress-ctf-{{ deployment_id }}
-      namespace: kubectf-challenges-instanced
+      namespace: ctfpilot-challenges-instanced
       labels:
         challenges.ctfpilot.com/type: web
         challenges.ctfpilot.com/name: whoami
