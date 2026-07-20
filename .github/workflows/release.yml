@@ -8,25 +8,30 @@ on:
 
 jobs:
   release:
+    name: Release
+    uses: ctfpilot/ci/.github/workflows/release.yml@v1.5.1
     permissions:
       contents: write
       packages: write
       id-token: write
-    name: Release
-    if: github.repository == 'ctfpilot/kube-ctf'
-    uses: the0mikkel/ci/.github/workflows/semver-release-standalone.yml@v1.4.0
+    secrets:
+      RELEASE_GH_TOKEN: ${{ secrets.RELEASE_GH_TOKEN }}
+    with:
+      repository: ctfpilot/kube-ctf
+      ENVIRONMENT: Release
 
   docker:
     name: Docker build and push
     needs:
       - release
-    uses: the0mikkel/ci/.github/workflows/docker.yml@v1.4.0
-    if: github.repository == 'ctfpilot/kube-ctf' && (needs.release.outputs.version != '' && needs.release.outputs.version != null)
+    uses: ctfpilot/ci/.github/workflows/docker.yml@v1.5.1
+    if: needs.release.outputs.version != '' && needs.release.outputs.version != null
     permissions:
       contents: read
       packages: write
       id-token: write
     with:
+      repository: ctfpilot/kube-ctf
       semver: ${{ needs.release.outputs.version }}
       arguments: |
         VERSION=${{ needs.release.outputs.version }}
