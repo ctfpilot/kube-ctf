@@ -14,7 +14,7 @@ permissions:
 jobs:
   CLAAssistant:
     name: "CLA Assistant"
-    uses: ctfpilot/ci/.github/workflows/cla-assistant.yml@v1.5.1
+    uses: ctfpilot/ci/.github/workflows/cla-assistant.yml@v1.5.2
     secrets: inherit
     with:
       repository: kube-ctf
