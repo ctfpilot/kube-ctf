@@ -1,11 +1,14 @@
-FROM node:16-alpine AS build
+FROM node:26.13.1-alpine AS base
+RUN npm install --global yarn@1.22.22
+
+FROM base AS build
 WORKDIR /build
 COPY package.* yarn.lock /build/
 RUN yarn install --frozen-lockfile
 COPY . .
 RUN yarn build
 
-FROM node:16-alpine AS prod
+FROM base AS prod
 WORKDIR /app
 COPY package.* yarn.lock /app/
 RUN yarn install --frozen-lockfile --production
