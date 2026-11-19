@@ -1,16 +1,12 @@
-import {
-  AppsV1Api,
-  KubeConfig,
-  KubernetesObjectApi,
-} from '@kubernetes/client-node';
+import {AppsV1Api, KubeConfig} from '@kubernetes/client-node';
 import {Challenge} from '../../types/Challenge';
 import handlebars from 'handlebars';
-import {apply, destroy, generateIdentifier} from './actions';
+import {apply, destroy, generateIdentifier, ManifestObjectApi} from './actions';
 import {ISOLATED_CHALLENGE_QUALIFIER} from '../../strings';
 
 export class DeploymentsStore {
   private apps: AppsV1Api;
-  private objectApi: KubernetesObjectApi;
+  private objectApi: ManifestObjectApi;
 
   constructor(
     cfg: KubeConfig,
@@ -21,7 +17,7 @@ export class DeploymentsStore {
     private secret: string
   ) {
     this.apps = cfg.makeApiClient(AppsV1Api);
-    this.objectApi = KubernetesObjectApi.makeApiClient(cfg);
+    this.objectApi = ManifestObjectApi.makeApiClient(cfg);
   }
 
   /**
@@ -31,32 +27,21 @@ export class DeploymentsStore {
    * @returns A list of deployments
    */
   async getDeploymentsByOwner(ownerId: string) {
-    return (
-      await this.apps.listNamespacedDeployment(
-        this.namespace,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        `${ISOLATED_CHALLENGE_QUALIFIER}/owner=${ownerId}`
-      )
-    ).body.items;
+    const {items} = await this.apps.listNamespacedDeployment({
+      namespace: this.namespace,
+      labelSelector: `${ISOLATED_CHALLENGE_QUALIFIER}/owner=${ownerId}`,
+    });
+    return items;
   }
 
   async getDeploymentByNameAndOwner(name: string, ownerId: string) {
     const identifier = generateIdentifier(name, ownerId, this.secret);
 
-    const items = (
-      await this.apps.listNamespacedDeployment(
-        this.namespace,
-        undefined,
-        undefined,
-        undefined,
-        `metadata.name=ctf-${identifier}`,
-        undefined,
-        1
-      )
-    ).body.items;
+    const {items} = await this.apps.listNamespacedDeployment({
+      namespace: this.namespace,
+      fieldSelector: `metadata.name=ctf-${identifier}`,
+      limit: 1,
+    });
     if (items.length === 0) return null;
     return items[0];
   }

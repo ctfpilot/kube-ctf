@@ -19,6 +19,15 @@ const mapDeploymentToResponse = ({ metadata }: V1Deployment) => ({
 
 export default async function register(fastify: FastifyInstance) {
   const { kubeClient, challengeConfigStore } = fastify.container.cradle;
+  const deploymentParams = {
+    type: 'object',
+    required: ['name'],
+    properties: {
+      name: {
+        $ref: 'challenge-manager.ctfpilot.com/schema/deployments.json#/properties/name',
+      },
+    },
+  };
 
   fastify.addSchema({
     $id: 'challenge-manager.ctfpilot.com/schema/deployments.json',
@@ -63,8 +72,8 @@ export default async function register(fastify: FastifyInstance) {
       request.log.info(
         `auth_info: owner_id=${payload.owner_id}${payload.admin ? ', admin' : ''}`
       );
-    } catch (e) {
-      request.log.warn('auth error', e);
+    } catch {
+      request.log.warn('auth error');
       reply.code(401).send({
         error: strings.ERROR_INVALID_CREDENTIALS,
       });
@@ -89,11 +98,7 @@ export default async function register(fastify: FastifyInstance) {
     method: 'GET',
     url: '/:name',
     schema: {
-      params: {
-        name: {
-          $ref: 'challenge-manager.ctfpilot.com/schema/deployments.json#/properties/name',
-        },
-      },
+      params: deploymentParams,
     },
     handler: async (request, reply) => {
       const owner = request.requestContext.get('owner') as string;
@@ -127,11 +132,7 @@ export default async function register(fastify: FastifyInstance) {
       body: {
         $ref: 'challenge-manager.ctfpilot.com/schema/deployments.json#/properties/options',
       },
-      params: {
-        name: {
-          $ref: 'challenge-manager.ctfpilot.com/schema/deployments.json#/properties/name',
-        },
-      },
+      params: deploymentParams,
     },
     handler: async (request, reply) => {
       const owner = request.requestContext.get('owner') as string;
@@ -205,11 +206,7 @@ export default async function register(fastify: FastifyInstance) {
     method: 'DELETE',
     url: '/:name',
     schema: {
-      params: {
-        name: {
-          $ref: 'challenge-manager.ctfpilot.com/schema/deployments.json#/properties/name',
-        },
-      },
+      params: deploymentParams,
     },
     handler: async (request, reply) => {
       const owner = request.requestContext.get('owner') as string;

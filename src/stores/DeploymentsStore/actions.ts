@@ -1,13 +1,54 @@
 import crypto from 'crypto';
 import {
+  HttpMethod,
+  KubeConfig,
   KubernetesObjectApi,
   KubernetesObject,
-  PatchUtils,
+  PatchStrategy,
+  V1Status,
 } from '@kubernetes/client-node';
 import yaml from 'js-yaml';
 
 const HMAC_ALGORITHM = 'sha256';
 const RAND_LENGTH = 16;
+
+export class ManifestObjectApi extends KubernetesObjectApi {
+  static override makeApiClient(config: KubeConfig): ManifestObjectApi {
+    const client = config.makeApiClient(ManifestObjectApi);
+    client.setDefaultNamespace(config);
+    return client;
+  }
+
+  async writeManifest(
+    spec: KubernetesObject,
+    action: 'create' | 'patch',
+    fieldManager?: string
+  ): Promise<KubernetesObject> {
+    const uri = await this.specUriPath(spec, action);
+    const patch = action === 'patch';
+    const request = this.configuration.baseServer.makeRequestContext(
+      uri,
+      patch ? HttpMethod.PATCH : HttpMethod.POST
+    );
+    request.setHeaderParam('Accept', 'application/json, */*;q=0.8');
+    request.setHeaderParam(
+      'Content-Type',
+      patch ? PatchStrategy.ServerSideApply : 'application/json'
+    );
+    if (patch) {
+      request.setQueryParam('pretty', 'false');
+      request.setQueryParam('force', 'true');
+      if (fieldManager !== undefined) {
+        request.setQueryParam('fieldManager', fieldManager);
+      }
+    }
+
+    // Keep manifest field names as written in YAML. Generated models rename
+    // some wire fields, such as LimitRange's "default".
+    request.setBody(JSON.stringify(spec));
+    return this.requestPromise(request);
+  }
+}
 
 /**
  * Generate a identifier for deployments by an owner.
@@ -41,7 +82,7 @@ interface ApplyOptions {
 }
 export async function apply(
   specString: string,
-  client: KubernetesObjectApi,
+  client: ManifestObjectApi,
   { fieldManager, extend, reset }: ApplyOptions
 ): Promise<KubernetesObject[]> {
   const specs: KubernetesObject[] = yaml.loadAll(
@@ -78,23 +119,12 @@ export async function apply(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (!(extend || reset)) await client.read(spec as any);
       // we got the resource, so it exists therefore patch
-      const response = await client.patch(
-        spec,
-        'false',
-        undefined,
-        fieldManager,
-        true,
-        {
-          headers: {
-            'content-type': PatchUtils.PATCH_FORMAT_APPLY_YAML,
-          },
-        }
-      );
-      created.push(response.body);
+      const response = await client.writeManifest(spec, 'patch', fieldManager);
+      created.push(response);
     } catch (e) {
       // we did not get the resource, so it does not exist, so create it
-      const response = await client.create(spec);
-      created.push(response.body);
+      const response = await client.writeManifest(spec, 'create');
+      created.push(response);
     }
   }
   return created;
@@ -103,10 +133,10 @@ export async function apply(
 export async function destroy(
   spec: string,
   client: KubernetesObjectApi
-): Promise<KubernetesObject[]> {
+): Promise<V1Status[]> {
   const specs: KubernetesObject[] = yaml.loadAll(spec) as KubernetesObject[];
   const validSpecs = specs.filter(s => s && s.kind && s.metadata);
-  const destroyed: KubernetesObject[] = [];
+  const destroyed: V1Status[] = [];
   for (const spec of validSpecs) {
     // this is to convince the old version of TypeScript that metadata exists even though we already filtered specs
     // without metadata out
@@ -115,7 +145,7 @@ export async function destroy(
     try {
       // try to delete resource
       const response = await client.delete(spec);
-      destroyed.push(response.body);
+      destroyed.push(response);
     } catch (e) {
       // we did not get the resource, therefore it may not exist
       console.warn(

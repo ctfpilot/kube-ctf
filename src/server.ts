@@ -1,6 +1,6 @@
-import fastify, {FastifyInstance} from 'fastify';
+import fastify, {FastifyError, FastifyInstance} from 'fastify';
 import fp from 'fastify-plugin';
-import {fastifyRequestContextPlugin} from '@fastify/request-context';
+import {fastifyRequestContext} from '@fastify/request-context';
 import {nanoid} from 'nanoid';
 import * as strings from './strings';
 import DeploymentRoute from './routes/deployment';
@@ -41,6 +41,13 @@ declare module 'fastify' {
   }
 }
 
+declare module '@fastify/request-context' {
+  interface RequestContextData {
+    owner?: string;
+    admin?: boolean;
+  }
+}
+
 export const init = async () => {
   const server = fastify({
     logger: true,
@@ -48,7 +55,7 @@ export const init = async () => {
   });
 
   // Load plugins
-  server.register(fastifyRequestContextPlugin, {
+  server.register(fastifyRequestContext, {
     hook: 'preValidation',
     defaultStoreValues: {},
   });
@@ -109,7 +116,7 @@ export const init = async () => {
     },
   });
 
-  server.setErrorHandler(async (error, request, reply) => {
+  server.setErrorHandler<FastifyError>(async (error, request, reply) => {
     if (error.validation) {
       return reply.status(400).send({error: error.message});
     }
